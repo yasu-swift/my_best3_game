@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\PostController;
 
 /*
 |--------------------------------------------------------------------------
@@ -13,12 +14,14 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
-
-Route::get('/', [PostController::class, 'index'])->name('root');
+// Route::get('/', function () {
+//     return view('welcome');
+// });
+Route::get('/', [PostController::class, 'index']);
 Route::resource('posts', PostController::class);
+
+// Route::get('/', [PostController::class, 'index'])->name('root');
+// Route::resource('posts', PostController::class);
 // Route::resource('posts', PostController::class)
 //     ->middleware('auth')
 //     ->only(['create', 'store', 'edit', 'update', 'destroy']);

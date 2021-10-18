@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\post;
+use App\Models\photo;
 use Illuminate\Http\Request;
+
 
 class PostController extends Controller
 {
@@ -14,7 +16,9 @@ class PostController extends Controller
      */
     public function index()
     {
-        //
+        $posts = Post::all();
+        $photos = Photo::all();
+        return view('posts.index', compact('posts', 'photos'));
     }
 
     /**

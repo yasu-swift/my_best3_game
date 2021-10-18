@@ -39,10 +39,10 @@ class PhotoFactory extends Factory
         // File::delete($file)で不要になったファイルを削除
         File::delete($file);
         return [
-            'name' => basename($file),
+            'name' => basename($path),
             // articleファクトリーを生成する
             'post_id' => \App\Models\Post::Factory()->create(),
-            'img_path' => basename($path),
+            'img_path' => basename($file),
         ];
     }
 }
