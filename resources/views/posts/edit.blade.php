@@ -2,8 +2,8 @@
 @extends('layouts.app')
 @section('title', '編集画面')
 @section('content')
-    {{-- @include('partial.flash')
-    @include('partial.errors') --}}
+    @include('partial.flash')
+    @include('partial.errors')
     <section>
         <article class="card shadow mb-3">
             <figure class="m-3">

@@ -5,6 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\Post;
 use App\Models\Photo;
 use Illuminate\Http\Request;
+use App\Http\Requests\ArticleRequest;
+use Illuminate\Support\Facades\Storage;
+use Exception;
+use Illuminate\Support\Facades\DB;
 
 
 class PostController extends Controller
@@ -16,9 +20,9 @@ class PostController extends Controller
      */
     public function index()
     {
-        $posts = Post::all();
+        // $posts = Post::all();
         $photos = Photo::all();
-        return view('posts.index', compact('posts', 'photos'));
+        return view('posts.index', compact('photos'));
     }
 
     /**
@@ -39,7 +43,62 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        // Postのデータを用意
+        $post = new Post($request->all());
+
+        // ユーザーIDを1に指定
+        $post->user_id = 1;
+        // ユーザーIDを自分の物にする
+        // $post->user_id = $request->user()->id;
+
+
+        // ファイルの用意
+        $file = $request->file('file');
+
+        // トランザクション開始
+        DB::beginTransaction();
+        try {
+            // Post保存
+            $post->save();
+
+            // 画像ファイル保存
+            if (!$path = Storage::putFile('posts', $file)) {
+                throw new Exception('ファイルの保存に失敗しました');
+            }
+
+            // 商品画像の保存
+            // foreach ($request->file('files') as $index => $e) {
+            //     $ext = $e['photo']->guessExtension();
+            //     $filename = "{$request->jan}_{$index}.{$ext}";
+            //     $path = $e['photo']->storeAs('photos', $filename);
+            //     // photosメソッドにより、商品に紐付けられた画像を保存する
+            //     $post->photos()->create(['path' => $path]);
+            // }
+
+            // Photoモデルの情報を用意
+            $photo = new Photo([
+                'post_id' => $post->id,
+                'img_path' => $file->getClientOriginalName(),
+                'name' => basename($path),
+            ]);
+            // dd($path);
+            // Photo保存
+            $photo->save();
+            // トランザクション終了(成功)
+            DB::commit();
+        } catch (\Exception $e) {
+            if (!empty($path)) {
+                Storage::delete($path);
+            }
+            // トランザクション終了(失敗)
+            DB::rollback();
+            return back()
+                ->withErrors($e->getMessage());
+        }
+
+        return redirect()
+            ->route('posts.index')
+            ->with(['flash_message' => '登録が完了しました']);
     }
 
     /**
@@ -48,9 +107,10 @@ class PostController extends Controller
      * @param  \App\Models\Post  $post
      * @return \Illuminate\Http\Response
      */
-    public function show(Post $post, Photo $photo)
+    public function show(Post $post)
     {
-        return view('posts.show', compact('post', 'photo'));
+        $photos = Photo::all();
+        return view('posts.show', compact('post'));
     }
 
     /**
@@ -73,7 +133,53 @@ class PostController extends Controller
      */
     public function update(Request $request, Post $post)
     {
-        //
+        // Postのデータを用意
+        // $post = new Post($request->all());
+
+        // ユーザーIDを1に指定
+        // $post->user_id = 1;
+        // ユーザーIDを自分の物にする
+        $post->user_id = $request->user()->id;
+
+
+        // ファイルの用意
+        $file = $request->file('file');
+
+        // トランザクション開始
+        DB::beginTransaction();
+        try {
+            // Post保存
+            $post->save();
+
+            // 画像ファイル保存
+            if (!$path = Storage::putFile('posts', $file)) {
+                throw new Exception('ファイルの保存に失敗しました');
+            }
+
+            // Photoモデルの情報を用意
+            $photo = new Photo([
+                'post_id' => $post->id,
+                'img_path' => $file->getClientOriginalName(),
+                'name' => basename($path),
+            ]);
+
+            // Photo保存
+            $photo->save();
+            // トランザクション終了(成功)
+            DB::commit();
+        } catch (\Exception $e) {
+            if (!empty($path)) {
+                Storage::delete($path);
+            }
+            // トランザクション終了(失敗)
+            DB::rollback();
+            return back()
+                ->withErrors($e->getMessage());
+        }
+
+        return redirect()
+            ->route('posts.index')
+            ->with(['flash_message' => '登録が完了しました']);
     }
 
     /**
@@ -84,6 +190,29 @@ class PostController extends Controller
      */
     public function destroy(Post $post)
     {
-        //
+        // $this->authorize('delete', $post);
+        // $pathに仮置しておく
+        $path = $post->image_path;
+
+        // トランザクション開始
+        DB::beginTransaction();
+        try {
+            // post削除すればattachmentも削除される
+            $post->delete();
+            // 画像削除
+            if (!Storage::delete($path)) {
+                // 例外を投げてロールバックさせる
+                throw new \Exception('画像ファイルの削除に失敗しました。');
+            }
+            // トランザクション終了(成功)
+            DB::commit();
+        } catch (\Exception $e) {
+            // トランザクション終了(失敗)
+            DB::rollback();
+            return back()->withErrors($e->getMessage());
+        }
+        return redirect()
+            ->route('posts.index')
+            ->with('notice', '記事を削除しました');
     }
 }
