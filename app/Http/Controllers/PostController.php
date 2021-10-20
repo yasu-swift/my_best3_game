@@ -20,7 +20,6 @@ class PostController extends Controller
      */
     public function index()
     {
-        // $posts = Post::all();
         $photos = Photo::all();
         return view('posts.index', compact('photos'));
     }
@@ -58,6 +57,7 @@ class PostController extends Controller
         // トランザクション開始
         DB::beginTransaction();
         try {
+
             // Post保存
             $post->save();
 
@@ -65,23 +65,13 @@ class PostController extends Controller
             if (!$path = Storage::putFile('posts', $file)) {
                 throw new Exception('ファイルの保存に失敗しました');
             }
-
-            // 商品画像の保存
-            // foreach ($request->file('files') as $index => $e) {
-            //     $ext = $e['photo']->guessExtension();
-            //     $filename = "{$request->jan}_{$index}.{$ext}";
-            //     $path = $e['photo']->storeAs('photos', $filename);
-            //     // photosメソッドにより、商品に紐付けられた画像を保存する
-            //     $post->photos()->create(['path' => $path]);
-            // }
-
             // Photoモデルの情報を用意
             $photo = new Photo([
                 'post_id' => $post->id,
                 'img_path' => $file->getClientOriginalName(),
                 'name' => basename($path),
             ]);
-            // dd($path);
+            // dd($photo);
             // Photo保存
             $photo->save();
             // トランザクション終了(成功)
@@ -133,53 +123,14 @@ class PostController extends Controller
      */
     public function update(Request $request, Post $post)
     {
-        // Postのデータを用意
-        // $post = new Post($request->all());
-
-        // ユーザーIDを1に指定
-        // $post->user_id = 1;
-        // ユーザーIDを自分の物にする
-        $post->user_id = $request->user()->id;
-
-
-        // ファイルの用意
-        $file = $request->file('file');
-
-        // トランザクション開始
-        DB::beginTransaction();
+        $post->fill($request->all());
         try {
-            // Post保存
             $post->save();
-
-            // 画像ファイル保存
-            if (!$path = Storage::putFile('posts', $file)) {
-                throw new Exception('ファイルの保存に失敗しました');
-            }
-
-            // Photoモデルの情報を用意
-            $photo = new Photo([
-                'post_id' => $post->id,
-                'img_path' => $file->getClientOriginalName(),
-                'name' => basename($path),
-            ]);
-
-            // Photo保存
-            $photo->save();
-            // トランザクション終了(成功)
-            DB::commit();
         } catch (\Exception $e) {
-            if (!empty($path)) {
-                Storage::delete($path);
-            }
-            // トランザクション終了(失敗)
-            DB::rollback();
-            return back()
-                ->withErrors($e->getMessage());
+            return back()->withErrors([$e->getMessage()]);
         }
 
-        return redirect()
-            ->route('posts.index')
-            ->with(['flash_message' => '登録が完了しました']);
+        return redirect()->route('posts.show', $post)->with(['flash_message' => '更新に成功しました']);
     }
 
     /**
@@ -190,14 +141,13 @@ class PostController extends Controller
      */
     public function destroy(Post $post)
     {
-        // $this->authorize('delete', $post);
         // $pathに仮置しておく
         $path = $post->image_path;
 
         // トランザクション開始
         DB::beginTransaction();
         try {
-            // post削除すればattachmentも削除される
+            // post削除すればphotoも削除される
             $post->delete();
             // 画像削除
             if (!Storage::delete($path)) {

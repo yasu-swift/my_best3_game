@@ -15,13 +15,7 @@
                         <figcaption>
                             <form action="{{ route('posts.update', $post) }}" method="post" id="form">
                                 @csrf
-                                {{-- 講義のはPATCHの''が右側無いので付け足す' --}}
                                 @method('PATCH')
-                                <div class="mb-3">
-                                    <label for="file" class="form-label">画像ファイルを選択してください</label>
-                                    <input type="file" name="file" id="file" class="form-control"
-                                        value="{{ old('file', $post->image_url) }}">
-                                </div>
                                 <div class="mb-3">
                                     <label for="title" class="form-label">イメージの説明を入力してください</label>
                                     <input type="text" name="title" id="title" class="form-control"

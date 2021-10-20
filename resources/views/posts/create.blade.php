@@ -2,8 +2,8 @@
 @section('title', '新規登録')
 @section('content')
     <div class="col-8 col-offset-2 mx-auto">
-        @include('partial.flash')
-        @include('partial.errors')
+        {{-- @include('partial.flash')
+        @include('partial.errors') --}}
         <form action="{{ route('posts.store') }}" method="post" enctype="multipart/form-data">
             <div class="card mb-3">
                 @csrf
@@ -11,9 +11,7 @@
                 <div class="row m-3">
                     <div class="mb-3">
                         <label for="file" class="form-label">画像ファイルを選択してください</label>
-                        <input type="file" name="file" id="file" class="form-control" value="{{ old('file') }}" multiple>
-                        {{-- <label for="photo">画像ファイル（複数可）:</label>
-                        <input type="file" class="form-control" name="files[][photo]" multiple> --}}
+                        <input type="file" name="file" id="file" class="form-control" value="{{ old('file') }}">
                     </div>
 
                     <div class="mb-3">

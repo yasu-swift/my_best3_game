@@ -10,11 +10,6 @@
             <figure class="m-3">
                 <div class="row">
                     <div class="col-6">
-                        {{-- {{ dd($post->photo->first->name->name) }} --}}
-                        {{-- <img src="{{ Storage::url('posts/' . App\Models\Photo::where('post_id', $post->id)->first()->name) }}"> --}}
-                        {{-- <img src="{{ Storage::url('posts/' . $post->photo->first->name->name) }}"> --}}
-                        {{-- <img src="{{ Storage::url($post->image_path) }}"> --}}
-                        {{-- <img src="{{ Storage::url('posts/' . $post->photo->name) }}" width="100%"> --}}
                         <img src="{{ $post->image_url }}" width="100%">
                     </div>
                     <div class="col-6">
@@ -31,4 +26,12 @@
             </figure>
         </article>
     </section>
-@endsection
+    <form action="{{ route('posts.destroy', $post) }}" method="post" id="form">
+        @csrf
+        @method('delete')
+    </form>
+    <div class="d-grid col-6 mx-auto gap-3">
+        <a href="{{ route('posts.index') }}" class="btn btn-secondary btn-lg">戻る</a>
+        <input type="submit" value="削除" form="form" class="btn btn-danger btn-lg"
+            onclick="if (!confirm('本当に削除してよろしいですか？')) {return false};">
+    @endsection
