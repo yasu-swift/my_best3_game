@@ -1,5 +1,5 @@
 {{-- {{ dd($photo) }} --}}
-@extends('layouts.app')
+@extends('layouts.main')
 @section('title', '編集画面')
 @section('content')
     @include('partial.flash')

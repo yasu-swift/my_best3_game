@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.main')
 @section('title', '詳細画面')
 @section('content')
     @include('partial.flash')

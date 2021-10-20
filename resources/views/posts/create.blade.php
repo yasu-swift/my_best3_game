@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.main')
 @section('title', '新規登録')
 @section('content')
     <div class="col-8 col-offset-2 mx-auto">
