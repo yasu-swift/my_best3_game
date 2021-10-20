@@ -23,6 +23,11 @@
                     </div>
                 </div>
             </figure>
+            @can('update', $post)
+                <a href="{{ route('posts.edit', $post) }}">
+                    <i class="fas fa-edit position-absolute top-0 end-0 fs-1"></i>
+                </a>
+            @endcan
         </article>
     </section>
     <form action="{{ route('posts.destroy', $post) }}" method="post" id="form">
@@ -31,6 +36,8 @@
     </form>
     <div class="d-grid col-6 mx-auto gap-3">
         <a href="{{ route('posts.index') }}" class="btn btn-secondary btn-lg">戻る</a>
-        <input type="submit" value="削除" form="form" class="btn btn-danger btn-lg"
-            onclick="if (!confirm('本当に削除してよろしいですか？')) {return false};">
+        @can('delete', $post)
+            <input type="submit" value="削除" form="form" class="btn btn-danger btn-lg"
+                onclick="if (!confirm('本当に削除してよろしいですか？')) {return false};">
+        @endcan
     @endsection

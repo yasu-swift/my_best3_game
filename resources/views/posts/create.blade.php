@@ -2,8 +2,8 @@
 @section('title', '新規登録')
 @section('content')
     <div class="col-8 col-offset-2 mx-auto">
-        {{-- @include('partial.flash')
-        @include('partial.errors') --}}
+        @include('partial.flash')
+        @include('partial.errors')
         <form action="{{ route('posts.store') }}" method="post" enctype="multipart/form-data">
             <div class="card mb-3">
                 @csrf

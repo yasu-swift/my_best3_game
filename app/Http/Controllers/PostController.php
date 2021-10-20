@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Post;
 use App\Models\Photo;
 use Illuminate\Http\Request;
-use App\Http\Requests\ArticleRequest;
+use App\Http\Requests\PostRequest;
 use Illuminate\Support\Facades\Storage;
 use Exception;
 use Illuminate\Support\Facades\DB;
@@ -13,6 +13,11 @@ use Illuminate\Support\Facades\DB;
 
 class PostController extends Controller
 {
+    public function __construct()
+    {
+        // アクションに合わせたpolicyのメソッドで認可されていないユーザーはエラーを投げる
+        $this->authorizeResource(Post::class, 'post');
+    }
     /**
      * Display a listing of the resource.
      *
@@ -44,13 +49,8 @@ class PostController extends Controller
     {
         // Postのデータを用意
         $post = new Post($request->all());
-
-        // ユーザーIDを1に指定
-        $post->user_id = 1;
         // ユーザーIDを自分の物にする
-        // $post->user_id = $request->user()->id;
-
-
+        $post->user_id = $request->user()->id;
         // ファイルの用意
         $file = $request->file('file');
 

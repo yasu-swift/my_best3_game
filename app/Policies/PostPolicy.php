@@ -5,6 +5,7 @@ namespace App\Policies;
 use App\Models\User;
 use App\Models\post;
 use Illuminate\Auth\Access\HandlesAuthorization;
+use Illuminate\Auth\Access\Response;
 
 class PostPolicy
 {
@@ -16,9 +17,9 @@ class PostPolicy
      * @param  \App\Models\User  $user
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function viewAny(User $user)
+    public function viewAny(?User $user)
     {
-        //
+        return true;
     }
 
     /**
@@ -28,9 +29,9 @@ class PostPolicy
      * @param  \App\Models\post  $post
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function view(User $user, post $post)
+    public function view(?User $user, post $post)
     {
-        //
+        return true;
     }
 
     /**
@@ -41,7 +42,7 @@ class PostPolicy
      */
     public function create(User $user)
     {
-        //
+        return true;
     }
 
     /**
@@ -53,7 +54,9 @@ class PostPolicy
      */
     public function update(User $user, post $post)
     {
-        //
+        return $user->id == $post->user_id
+            ? Response::allow()
+            : Response::deny('許可されていない操作です');
     }
 
     /**
@@ -65,7 +68,9 @@ class PostPolicy
      */
     public function delete(User $user, post $post)
     {
-        //
+        return $user->id == $post->user_id
+            ? Response::allow()
+            : Response::deny('許可されていない操作です');
     }
 
     /**
