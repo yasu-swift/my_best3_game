@@ -5,8 +5,6 @@
     @include('partial.errors')
     {{-- {{ dd($photos) }} --}}
     {{-- {{ dd($posts) }} --}}
-    <h1>画像一覧</h1>
-
     <section class="row position-relative" data-masonry='{ "percentPosition": true }'>
         @foreach ($photos as $photo)
             <div class="col-6 col-md-4 col-lg-3 col-sl-2 mb-4">

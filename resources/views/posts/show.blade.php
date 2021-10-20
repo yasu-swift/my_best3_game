@@ -3,7 +3,6 @@
 @section('content')
     @include('partial.flash')
     @include('partial.errors')
-    <h1>画像詳細</h1>
     {{-- {{ dd($post) }} --}}
     <section>
         <article class="card shadow">
