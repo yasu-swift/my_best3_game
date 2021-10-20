@@ -19,6 +19,7 @@ class OAuthController extends Controller
         return Socialite::driver('github')->redirect();
     }
 
+    
     public function oauthCallback()
     {
         try {
@@ -26,6 +27,29 @@ class OAuthController extends Controller
         } catch (\Throwable $th) {
             return redirect('/login')->withErrors(['oauth' => '予期せぬエラーが発生しました']);
         }
-        dd($socialUser);
+        $user = User::firstOrNew(['email' => $socialUser->getEmail()]);
+        // 新規ユーザーの処理
+        if (!$user->exists) {
+            $user->name = $socialUser->getNickname() ?? $socialUser->name;
+            $identityProvider = new IdentityProvider([
+                'id' => $socialUser->getId(),
+                'name' => 'github'
+            ]);
+
+            DB::beginTransaction();
+            try {
+                $user->save();
+                $user->identityProvider()->save($identityProvider);
+                DB::commit();
+            } catch (\Exception $e) {
+                DB::rollBack();
+                return redirect()
+                    ->route('login')
+                    ->withErrors(['transaction_error' => '保存に失敗しました']);
+            }
+        }
+        Auth::login($user);
+
+        return redirect(RouteServiceProvider::HOME);
     }
 }
