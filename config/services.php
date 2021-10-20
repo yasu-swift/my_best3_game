@@ -35,11 +35,11 @@ return [
         'client_secret' => env('GITHUB_CLIENT_SECRET'),
         'redirect' => '/auth/github/callback',
     ],
-    // 'google' => [
-    //     'client_id' => env('GOOGLE_CLIENT_ID'),
-    //     'client_secret' => env('GOOGLE_CLIENT_SECRET'),
-    //     'redirect' => '/auth/google/callback',
-    // ],
+    'google' => [
+        'client_id' => env('GOOGLE_CLIENT_ID'),
+        'client_secret' => env('GOOGLE_CLIENT_SECRET'),
+        'redirect' => '/auth/google/callback',
+    ],
 
     // 'line' => [
     //     'client_id' => env('LINE_CLIENT_ID'),
