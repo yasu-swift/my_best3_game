@@ -47,7 +47,6 @@ class PostController extends Controller
     {
         // Postのデータを用意
         $post = new Post($request->all());
-        $post->fill($request->all());
         // ユーザーIDを自分の物にする
         $post->user_id = $request->user()->id;
         // ファイルの用意
@@ -62,11 +61,6 @@ class PostController extends Controller
             foreach ($files as $file) {
                 $file_name = $file->getClientOriginalName();
                 $path = Storage::putFile('posts', $file);
-                $paths[] = $path;
-
-                if (!$paths) {
-                    throw new \Exception("保存に失敗しました");
-                }
 
                 $photo = new Photo;
                 $photo->post_id = $post->id;
@@ -75,11 +69,10 @@ class PostController extends Controller
 
                 $photo->save();
             }
-
             // トランザクション終了(成功)
             DB::commit();
         } catch (\Exception $e) {
-            if (!empty($path)) {
+            if (!empty($paths)) {
                 foreach ($paths as $path) {
                     Storage::delete($path);
                 }
