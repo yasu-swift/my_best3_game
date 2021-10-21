@@ -30,10 +30,10 @@ class post extends Model
     // アクセサとしてつくるのでget付ける
     public function getImageUrlAttribute()
     {
-        // if (config('filesystems.default') == 'gcs') {
-        //     return Storage::temporaryUrl($this->image_path, now()->addMinutes(5));
-        // }
-        // return Storage::url($this->image_path);
+        if (config('filesystems.default') == 'gcs') {
+            return Storage::temporaryUrl($this->image_path, now()->addMinutes(5));
+        }
+        
         return Storage::url($this->image_path);
     }
 }
