@@ -1,0 +1,24 @@
+// Fonts
+@import url('https://fonts.googleapis.com/css?family=Nunito');
+
+// Variables
+@import 'variables';
+
+// Bootstrap
+@import '~bootstrap/scss/bootstrap';
+
+// Font Awesome
+@import '~@fortawesome/fontawesome-free/scss/fontawesome';
+@import '~@fortawesome/fontawesome-free/scss/regular';
+@import '~@fortawesome/fontawesome-free/scss/solid';
+@import '~@fortawesome/fontawesome-free/scss/brands';
+
+// sail npm run devをすればCSS適用される
+.bottom-right-50{
+    color: brown;
+    font-size: larger;
+    bottom: 50px;
+    right: 50px;
+    // Masonryで動いた要素の下に隠れてしまうのを防ぐ為、z-indexを指定します
+    z-index: 10;
+}

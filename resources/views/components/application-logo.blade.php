@@ -1,0 +1,1 @@
+<h1 class="text-xl">Best3 Game</h1>
