@@ -23,12 +23,10 @@ class PhotoFactory extends Factory
      */
     public function definition()
     {
-        // 講義でやってない所あるので確認
-
         // 画像サイズを指定
         $width = 500;
         $height = random_int(250, 600);
-
+        
         // 画像を保存してpathを取得
         // image(’保存先のpath', 画像の横サイズ, 画像の縦サイズ)
         $file = $this->faker->image(null, $width, $height);

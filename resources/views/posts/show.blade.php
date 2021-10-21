@@ -3,14 +3,15 @@
 @section('content')
     @include('partial.flash')
     @include('partial.errors')
-    {{-- {{ dd($post) }} --}}
     <section>
         <article class="card shadow">
             <figure class="m-3">
                 <div class="row">
-                    <div class="col-6">
-                        <img src="{{ $post->image_url }}" width="100%">
-                    </div>
+                    @foreach ($post->photo as $photo)
+                        <article class="w-full px-4 md:w-1/4 text-xl text-gray-800 leading-normal">
+                            <td><img src="{{ Storage::url('posts/' . $photo->name) }}" width="100%"></td>
+                        </article>
+                    @endforeach
                     <div class="col-6">
                         <figcaption>
                             <h1>
@@ -40,4 +41,5 @@
             <input type="submit" value="削除" form="form" class="btn btn-danger btn-lg"
                 onclick="if (!confirm('本当に削除してよろしいですか？')) {return false};">
         @endcan
-    @endsection
+    </div>
+@endsection

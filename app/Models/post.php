@@ -24,8 +24,7 @@ class post extends Model
     // アクセサとしてつくるのでget付ける
     public function getImagePathAttribute()
     {
-        // return 'posts/' . $this->post->img_path;
-        return 'posts/' . $this->photo->first->name->name;
+        return 'posts/' . $this->photo[0]->name;
     }
     // アクセサとしてつくるのでget付ける
     public function getImageUrlAttribute()
@@ -33,7 +32,7 @@ class post extends Model
         if (config('filesystems.default') == 'gcs') {
             return Storage::temporaryUrl($this->image_path, now()->addMinutes(5));
         }
-        
+
         return Storage::url($this->image_path);
     }
 }

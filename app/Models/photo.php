@@ -20,19 +20,4 @@ class photo extends Model
     {
         return $this->belongsTo(\App\Models\Post::class);
     }
-
-    // アクセサとしてつくるのでget付ける
-    public function getImagePathAttribute()
-    {
-        return 'posts/' . $this->name;
-    }
-    // アクセサとしてつくるのでget付ける
-    public function getImageUrlAttribute()
-    {
-        // if (config('filesystems.default') == 'gcs') {
-        //     return Storage::temporaryUrl($this->image_path, now()->addMinutes(5));
-        // }
-        // return Storage::url($this->image_path);
-        return Storage::url($this->image_path);
-    }
 }

@@ -33,7 +33,6 @@ class PostFactory extends Factory
             'body' => $this->faker->paragraph(),
             // user_idはUserモデルを生成してそのデータを取得
             'user_id' => \App\Models\User::factory()->create(),
-            // 'img_path' => basename($path),
         ];
     }
 }

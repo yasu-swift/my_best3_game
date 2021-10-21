@@ -3,17 +3,14 @@
 @section('content')
     @include('partial.flash')
     @include('partial.errors')
-    {{-- {{ dd($photos) }} --}}
-    {{-- {{ dd($posts) }} --}}
     <section class="row position-relative" data-masonry='{ "percentPosition": true }'>
-        @foreach ($photos as $photo)
+        @foreach ($posts as $post)
             <div class="col-6 col-md-4 col-lg-3 col-sl-2 mb-4">
                 <article class="card position-relative">
-                    {{-- {{ dd($photo) }} --}}
-                    <img src="{{ $photo->image_url }}" alt="画像" class="card-img-top">
+                    <img src="{{ $post->image_url }}" alt="画像" class="card-img-top">
                     <div class="card-title mx-3">
-                        <a href="{{ route('posts.show', $photo) }}" class="text-decoration-none stretched-link">
-                            {{ $photo->post->title }}
+                        <a href="{{ route('posts.show', $post) }}" class="text-decoration-none stretched-link">
+                            {{ $post->title }}
                         </a>
                     </div>
                 </article>

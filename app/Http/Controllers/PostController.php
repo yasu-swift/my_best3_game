@@ -5,11 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Post;
 use App\Models\Photo;
 use Illuminate\Http\Request;
-use App\Http\Requests\PostRequest;
 use Illuminate\Support\Facades\Storage;
 use Exception;
 use Illuminate\Support\Facades\DB;
-
 
 class PostController extends Controller
 {
@@ -25,8 +23,8 @@ class PostController extends Controller
      */
     public function index()
     {
-        $photos = Photo::all();
-        return view('posts.index', compact('photos'));
+        $posts = Post::all();
+        return view('posts.index', compact('posts'));
     }
 
     /**
@@ -49,43 +47,41 @@ class PostController extends Controller
     {
         // Postのデータを用意
         $post = new Post($request->all());
+        $post->fill($request->all());
         // ユーザーIDを自分の物にする
         $post->user_id = $request->user()->id;
         // ファイルの用意
-        $file = $request->file('file');
-
-        // トランザクション開始
-        DB::beginTransaction();
-        try {
-
-            // Post保存
-            $post->save();
-
-            // 画像ファイル保存
-            if (!$path = Storage::putFile('posts', $file)) {
-                throw new Exception('ファイルの保存に失敗しました');
+        $files = $request->file('file');
+        foreach ($files as $file) {
+            // トランザクション開始
+            DB::beginTransaction();
+            try {
+                // Post保存
+                $post->save();
+                // 画像ファイル保存
+                if (!$path = Storage::putFile('posts', $file)) {
+                    throw new Exception('ファイルの保存に失敗しました');
+                }
+                // Photoモデルの情報を用意
+                $photo = new Photo([
+                    'post_id' => $post->id,
+                    'img_path' => $file->getClientOriginalName(),
+                    'name' => basename($path),
+                ]);
+                // Photo保存
+                $photo->save([]);
+                // トランザクション終了(成功)
+                DB::commit();
+            } catch (\Exception $e) {
+                if (!empty($path)) {
+                    Storage::delete($path);
+                }
+                // トランザクション終了(失敗)
+                DB::rollback();
+                return back()
+                    ->withErrors($e->getMessage());
             }
-            // Photoモデルの情報を用意
-            $photo = new Photo([
-                'post_id' => $post->id,
-                'img_path' => $file->getClientOriginalName(),
-                'name' => basename($path),
-            ]);
-            // dd($photo);
-            // Photo保存
-            $photo->save();
-            // トランザクション終了(成功)
-            DB::commit();
-        } catch (\Exception $e) {
-            if (!empty($path)) {
-                Storage::delete($path);
-            }
-            // トランザクション終了(失敗)
-            DB::rollback();
-            return back()
-                ->withErrors($e->getMessage());
         }
-
         return redirect()
             ->route('posts.index')
             ->with(['flash_message' => '登録が完了しました']);
@@ -99,7 +95,6 @@ class PostController extends Controller
      */
     public function show(Post $post)
     {
-        $photos = Photo::all();
         return view('posts.show', compact('post'));
     }
 
@@ -141,28 +136,13 @@ class PostController extends Controller
      */
     public function destroy(Post $post)
     {
-        // $pathに仮置しておく
-        $path = $post->image_path;
-
-        // トランザクション開始
-        DB::beginTransaction();
-        try {
-            // post削除すればphotoも削除される
-            $post->delete();
-            // 画像削除
-            if (!Storage::delete($path)) {
-                // 例外を投げてロールバックさせる
-                throw new \Exception('画像ファイルの削除に失敗しました。');
-            }
-            // トランザクション終了(成功)
-            DB::commit();
-        } catch (\Exception $e) {
-            // トランザクション終了(失敗)
-            DB::rollback();
-            return back()->withErrors($e->getMessage());
+        $images = $post->photo;
+        $post->delete();
+        foreach ($images as $image) {
+            Storage::delete('posts/' . $image->name);
         }
         return redirect()
             ->route('posts.index')
-            ->with('notice', '記事を削除しました');
+            ->with(['flash_message' => '記事を削除しました']);
     }
 }
