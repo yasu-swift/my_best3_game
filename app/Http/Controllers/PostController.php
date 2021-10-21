@@ -58,25 +58,31 @@ class PostController extends Controller
         try {
             // Post保存
             $post->save();
+
             foreach ($files as $file) {
-                // 画像ファイル保存
-                if (!$path = Storage::putFile('posts', $file)) {
-                    throw new Exception('ファイルの保存に失敗しました');
+                $file_name = $file->getClientOriginalName();
+                $path = Storage::putFile('posts', $file);
+                $paths[] = $path;
+
+                if (!$paths) {
+                    throw new \Exception("保存に失敗しました");
                 }
-                // Photoモデルの情報を用意
-                $photo = new Photo([
-                    'post_id' => $post->id,
-                    'img_path' => $file->getClientOriginalName(),
-                    'name' => basename($path),
-                ]);
-                // Photo保存
-                $photo->save([]);
+
+                $photo = new Photo;
+                $photo->post_id = $post->id;
+                $photo->img_path = $file_name;
+                $photo->name = basename($path);
+
+                $photo->save();
             }
+
             // トランザクション終了(成功)
             DB::commit();
         } catch (\Exception $e) {
             if (!empty($path)) {
-                Storage::delete($path);
+                foreach ($paths as $path) {
+                    Storage::delete($path);
+                }
             }
             // トランザクション終了(失敗)
             DB::rollback();
