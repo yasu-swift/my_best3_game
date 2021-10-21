@@ -52,12 +52,13 @@ class PostController extends Controller
         $post->user_id = $request->user()->id;
         // ファイルの用意
         $files = $request->file('file');
-        foreach ($files as $file) {
-            // トランザクション開始
-            DB::beginTransaction();
-            try {
-                // Post保存
-                $post->save();
+
+        // トランザクション開始
+        DB::beginTransaction();
+        try {
+            // Post保存
+            $post->save();
+            foreach ($files as $file) {
                 // 画像ファイル保存
                 if (!$path = Storage::putFile('posts', $file)) {
                     throw new Exception('ファイルの保存に失敗しました');
@@ -70,17 +71,17 @@ class PostController extends Controller
                 ]);
                 // Photo保存
                 $photo->save([]);
-                // トランザクション終了(成功)
-                DB::commit();
-            } catch (\Exception $e) {
-                if (!empty($path)) {
-                    Storage::delete($path);
-                }
-                // トランザクション終了(失敗)
-                DB::rollback();
-                return back()
-                    ->withErrors($e->getMessage());
             }
+            // トランザクション終了(成功)
+            DB::commit();
+        } catch (\Exception $e) {
+            if (!empty($path)) {
+                Storage::delete($path);
+            }
+            // トランザクション終了(失敗)
+            DB::rollback();
+            return back()
+                ->withErrors($e->getMessage());
         }
         return redirect()
             ->route('posts.index')
